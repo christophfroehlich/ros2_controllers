@@ -352,6 +352,7 @@ controller_interface::return_type JointTrajectoryController::update(
           }
           else
           {
+            std::cout << "effort if size: " << state_desired_.effort.size() << std::endl;
             assign_interface_from_point(joint_command_interface_[3], state_desired_.effort);
           }
         }

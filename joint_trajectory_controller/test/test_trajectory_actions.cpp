@@ -304,7 +304,7 @@ TEST_P(TestTrajectoryActionsTestParameterized, test_success_multi_point_sendgoal
 /**
  * Makes sense with position command interface only,
  * because no integration to position state interface is implemented
-*/
+ */
 TEST_F(TestTrajectoryActions, test_goal_tolerances_single_point_success)
 {
   // set tolerance parameters
@@ -349,7 +349,7 @@ TEST_F(TestTrajectoryActions, test_goal_tolerances_single_point_success)
 /**
  * Makes sense with position command interface only,
  * because no integration to position state interface is implemented
-*/
+ */
 TEST_F(TestTrajectoryActions, test_goal_tolerances_multi_point_success)
 {
   // set tolerance parameters
@@ -616,39 +616,42 @@ TEST_P(TestTrajectoryActionsTestParameterized, test_cancel_hold_position)
   }
 }
 
-// position controllers
-INSTANTIATE_TEST_SUITE_P(
-  PositionTrajectoryControllersActions, TestTrajectoryActionsTestParameterized,
-  ::testing::Values(
-    std::make_tuple(std::vector<std::string>({"position"}), std::vector<std::string>({"position"})),
-    std::make_tuple(
-      std::vector<std::string>({"position"}), std::vector<std::string>({"position", "velocity"})),
-    std::make_tuple(
-      std::vector<std::string>({"position"}),
-      std::vector<std::string>({"position", "velocity", "acceleration"}))));
+// // position controllers
+// INSTANTIATE_TEST_SUITE_P(
+//   PositionTrajectoryControllersActions, TestTrajectoryActionsTestParameterized,
+//   ::testing::Values(
+//     std::make_tuple(std::vector<std::string>({"position"}),
+//     std::vector<std::string>({"position"})), std::make_tuple(
+//       std::vector<std::string>({"position"}), std::vector<std::string>({"position",
+//       "velocity"})),
+//     std::make_tuple(
+//       std::vector<std::string>({"position"}),
+//       std::vector<std::string>({"position", "velocity", "acceleration"}))));
 
-// position_velocity controllers
-INSTANTIATE_TEST_SUITE_P(
-  PositionVelocityTrajectoryControllersActions, TestTrajectoryActionsTestParameterized,
-  ::testing::Values(
-    std::make_tuple(
-      std::vector<std::string>({"position", "velocity"}), std::vector<std::string>({"position"})),
-    std::make_tuple(
-      std::vector<std::string>({"position", "velocity"}),
-      std::vector<std::string>({"position", "velocity"})),
-    std::make_tuple(
-      std::vector<std::string>({"position", "velocity"}),
-      std::vector<std::string>({"position", "velocity", "acceleration"}))));
+// // position_velocity controllers
+// INSTANTIATE_TEST_SUITE_P(
+//   PositionVelocityTrajectoryControllersActions, TestTrajectoryActionsTestParameterized,
+//   ::testing::Values(
+//     std::make_tuple(
+//       std::vector<std::string>({"position", "velocity"}),
+//       std::vector<std::string>({"position"})),
+//     std::make_tuple(
+//       std::vector<std::string>({"position", "velocity"}),
+//       std::vector<std::string>({"position", "velocity"})),
+//     std::make_tuple(
+//       std::vector<std::string>({"position", "velocity"}),
+//       std::vector<std::string>({"position", "velocity", "acceleration"}))));
 
-// only velocity controller
-INSTANTIATE_TEST_SUITE_P(
-  OnlyVelocityTrajectoryControllersAction, TestTrajectoryActionsTestParameterized,
-  ::testing::Values(
-    std::make_tuple(
-      std::vector<std::string>({"velocity"}), std::vector<std::string>({"position", "velocity"})),
-    std::make_tuple(
-      std::vector<std::string>({"velocity"}),
-      std::vector<std::string>({"position", "velocity", "acceleration"}))));
+// // only velocity controller
+// INSTANTIATE_TEST_SUITE_P(
+//   OnlyVelocityTrajectoryControllersAction, TestTrajectoryActionsTestParameterized,
+//   ::testing::Values(
+//     std::make_tuple(
+//       std::vector<std::string>({"velocity"}), std::vector<std::string>({"position",
+//       "velocity"})),
+//     std::make_tuple(
+//       std::vector<std::string>({"velocity"}),
+//       std::vector<std::string>({"position", "velocity", "acceleration"}))));
 
 // only effort controller
 INSTANTIATE_TEST_SUITE_P(

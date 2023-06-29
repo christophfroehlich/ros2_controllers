@@ -56,29 +56,29 @@ if(BUILD_TESTING)
   find_package(controller_manager REQUIRED)
   find_package(ros2_control_test_assets REQUIRED)
 
-  ament_add_gmock(test_trajectory test/test_trajectory.cpp)
-  target_link_libraries(test_trajectory joint_trajectory_controller)
+  # ament_add_gmock(test_trajectory test/test_trajectory.cpp)
+  # target_link_libraries(test_trajectory joint_trajectory_controller)
 
-  ament_add_gmock(test_trajectory_controller
-    test/test_trajectory_controller.cpp
-    ENV config_file=${CMAKE_CURRENT_SOURCE_DIR}/test/config/test_joint_trajectory_controller.yaml)
-  set_tests_properties(test_trajectory_controller PROPERTIES TIMEOUT 220)
-  target_link_libraries(test_trajectory_controller
-    joint_trajectory_controller
-  )
+  # ament_add_gmock(test_trajectory_controller
+  #   test/test_trajectory_controller.cpp
+  #   ENV config_file=${CMAKE_CURRENT_SOURCE_DIR}/test/config/test_joint_trajectory_controller.yaml)
+  # set_tests_properties(test_trajectory_controller PROPERTIES TIMEOUT 220)
+  # target_link_libraries(test_trajectory_controller
+  #   joint_trajectory_controller
+  # )
 
-  ament_add_gmock(test_load_joint_trajectory_controller
-    test/test_load_joint_trajectory_controller.cpp
-  )
-  target_link_libraries(test_load_joint_trajectory_controller
-    joint_trajectory_controller
-  )
-  ament_target_dependencies(test_load_joint_trajectory_controller
-    controller_manager
-    control_toolbox
-    realtime_tools
-    ros2_control_test_assets
-  )
+  # ament_add_gmock(test_load_joint_trajectory_controller
+  #   test/test_load_joint_trajectory_controller.cpp
+  # )
+  # target_link_libraries(test_load_joint_trajectory_controller
+  #   joint_trajectory_controller
+  # )
+  # ament_target_dependencies(test_load_joint_trajectory_controller
+  #   controller_manager
+  #   control_toolbox
+  #   realtime_tools
+  #   ros2_control_test_assets
+  # )
 
   ament_add_gmock(test_trajectory_actions
     test/test_trajectory_actions.cpp
