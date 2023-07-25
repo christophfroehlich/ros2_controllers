@@ -77,9 +77,9 @@ protected:
 
     SetUpActionClient();
 
-    executor_.add_node(node_->get_node_base_interface());
+    executor_->add_node(node_->get_node_base_interface());
 
-    executor_future_handle_ = std::async(std::launch::async, [&]() -> void { executor_.spin(); });
+    executor_future_handle_ = std::async(std::launch::async, [&]() -> void {executor_->spin();});
   }
 
   void SetUpControllerHardware()
@@ -94,8 +94,7 @@ protected:
         auto start_time = clock.now();
         rclcpp::Duration wait = rclcpp::Duration::from_seconds(2.0);
         auto end_time = start_time + wait;
-        while (clock.now() < end_time)
-        {
+        while (clock.now() < end_time) {
           traj_controller_->update(clock.now(), clock.now() - start_time);
         }
       });
@@ -112,13 +111,12 @@ protected:
       controller_name_ + "/follow_joint_trajectory");
 
     bool response = action_client_->wait_for_action_server(std::chrono::seconds(1));
-    if (!response)
-    {
+    if (!response) {
       throw std::runtime_error("could not get action server");
     }
   }
 
-  static void TearDownTestCase() { rclcpp::shutdown(); }
+  static void TearDownTestCase() {rclcpp::shutdown();}
 
   void TearDown()
   {
@@ -128,21 +126,18 @@ protected:
 
   void TearDownExecutor()
   {
-    if (setup_executor_)
-    {
+    if (setup_executor_) {
       setup_executor_ = false;
-      executor_.cancel();
+      executor_->cancel();
       executor_future_handle_.wait();
     }
   }
 
   void TearDownControllerHardware()
   {
-    if (setup_controller_hw_)
-    {
+    if (setup_controller_hw_) {
       setup_controller_hw_ = false;
-      if (controller_hw_thread_.joinable())
-      {
+      if (controller_hw_thread_.joinable()) {
         controller_hw_thread_.join();
       }
     }
@@ -168,7 +163,7 @@ protected:
   int common_action_result_code_ = control_msgs::action::FollowJointTrajectory_Result::SUCCESSFUL;
 
   bool setup_executor_ = false;
-  rclcpp::executors::MultiThreadedExecutor executor_;
+  rclcpp::executors::MultiThreadedExecutor::UniquePtr executor_;
   std::future<void> executor_future_handle_;
 
   bool setup_controller_hw_ = false;
@@ -183,8 +178,7 @@ public:
       node_->get_logger(), "common_result_response time: %f", rclcpp::Clock().now().seconds());
     common_resultcode_ = result.code;
     common_action_result_code_ = result.result->error_code;
-    switch (result.code)
-    {
+    switch (result.code) {
       case rclcpp_action::ResultCode::SUCCEEDED:
         break;
       case rclcpp_action::ResultCode::ABORTED:
@@ -202,7 +196,7 @@ public:
 
 // From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
 class TestTrajectoryActionsTestParameterized
-: public TestTrajectoryActions,
+  : public TestTrajectoryActions,
   public ::testing::WithParamInterface<
     std::tuple<std::vector<std::string>, std::vector<std::string>>>
 {
@@ -214,7 +208,7 @@ public:
     state_interface_types_ = std::get<1>(GetParam());
   }
 
-  static void TearDownTestCase() { TrajectoryControllerTest::TearDownTestCase(); }
+  static void TearDownTestCase() {TrajectoryControllerTest::TearDownTestCase();}
 };
 
 TEST_P(TestTrajectoryActionsTestParameterized, test_success_single_point_sendgoal)
@@ -260,8 +254,8 @@ TEST_P(TestTrajectoryActionsTestParameterized, test_success_multi_point_sendgoal
   bool feedback_recv = false;
   goal_options_.feedback_callback =
     [&](
-      rclcpp_action::ClientGoalHandle<FollowJointTrajectoryMsg>::SharedPtr,
-      const std::shared_ptr<const FollowJointTrajectoryMsg::Feedback>) { feedback_recv = true; };
+    rclcpp_action::ClientGoalHandle<FollowJointTrajectoryMsg>::SharedPtr,
+    const std::shared_ptr<const FollowJointTrajectoryMsg::Feedback>) {feedback_recv = true;};
 
   std::shared_future<typename GoalHandle::SharedPtr> gh_future;
   // send goal with multiple points
@@ -361,8 +355,8 @@ TEST_F(TestTrajectoryActions, test_goal_tolerances_multi_point_success)
   bool feedback_recv = false;
   goal_options_.feedback_callback =
     [&](
-      rclcpp_action::ClientGoalHandle<FollowJointTrajectoryMsg>::SharedPtr,
-      const std::shared_ptr<const FollowJointTrajectoryMsg::Feedback>) { feedback_recv = true; };
+    rclcpp_action::ClientGoalHandle<FollowJointTrajectoryMsg>::SharedPtr,
+    const std::shared_ptr<const FollowJointTrajectoryMsg::Feedback>) {feedback_recv = true;};
 
   std::shared_future<typename GoalHandle::SharedPtr> gh_future;
   // send goal with multiple points
