@@ -221,14 +221,10 @@ public:
     bool separate_cmd_and_state_values = false, double k_p = 0.0, double ff = 1.0,
     bool normalize_error = false)
   {
-    SetUpTrajectoryController(executor);
+    SetUpTrajectoryController(executor, parameters);
 
     // set pid parameters before configure
     SetPidParameters(k_p, ff, normalize_error);
-    for (const auto & param : parameters)
-    {
-      traj_controller_->get_node()->set_parameter(param);
-    }
     // ignore velocity tolerances for this test since they aren't committed in test_robot->write()
     rclcpp::Parameter stopped_velocity_parameters("constraints.stopped_velocity_tolerance", 0.0);
     traj_controller_->get_node()->set_parameter(stopped_velocity_parameters);
