@@ -971,8 +971,7 @@ TEST_P(TrajectoryControllerTestParameterized, trajectory_error_command_joints_le
     EXPECT_LT(0.0, joint_vel_[1]);
     EXPECT_TRUE(std::isnan(current_command.velocities[2]));
 
-    // use_closed_loop_pid_adapter_
-    if (traj_controller_->use_closed_loop_pid_adapter())
+    if (traj_controller_->use_external_control_law())
     {
       // we expect u = k_p * (s_d-s)
       EXPECT_NEAR(
@@ -1064,8 +1063,7 @@ TEST_P(TrajectoryControllerTestParameterized, trajectory_error_command_joints_le
     EXPECT_LT(0.0, joint_vel_[1]);
     EXPECT_TRUE(std::isnan(current_command.velocities[2]));
 
-    // use_closed_loop_pid_adapter_
-    if (traj_controller_->use_closed_loop_pid_adapter())
+    if (traj_controller_->use_external_control_law())
     {
       // we expect u = k_p * (s_d-s)
       EXPECT_NEAR(
