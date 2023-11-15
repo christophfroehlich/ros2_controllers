@@ -179,6 +179,9 @@ TEST_P(TrajectoryControllerTestParameterized, check_interface_names_with_command
     command_interfaces.names, testing::UnorderedElementsAreArray(command_interface_names));
 }
 
+/**
+ * \brief same as check_interface_names_with_command_joints but with #command-joints < #dof
+ */
 TEST_P(
   TrajectoryControllerTestParameterized, check_interface_names_with_command_joints_less_than_dof)
 {
@@ -391,6 +394,10 @@ TEST_P(TrajectoryControllerTestParameterized, correct_initialization_using_param
   executor.cancel();
 }
 
+/**
+ * @brief check if state topic is consistent with parameters
+ */
+
 TEST_P(TrajectoryControllerTestParameterized, state_topic_consistency)
 {
   rclcpp::executors::SingleThreadedExecutor executor;
@@ -487,6 +494,10 @@ TEST_P(TrajectoryControllerTestParameterized, state_topic_consistency)
     EXPECT_EQ(n_joints, state->output.effort.size());
   }
 }
+
+/**
+ * @brief same as state_topic_consistency but with #command-joints < #dof
+ */
 
 TEST_P(TrajectoryControllerTestParameterized, state_topic_consistency_command_joints_less_than_dof)
 {
@@ -875,7 +886,8 @@ TEST_P(TrajectoryControllerTestParameterized, trajectory_error_command_joints_le
 }
 
 /**
- * @brief check if trajectory error is calculated correctly in case #command-joints < #dof
+ * @brief check if trajectory error is calculated correctly in case #command-joints < #dof, but with
+ * jumbled order of command joints
  */
 TEST_P(TrajectoryControllerTestParameterized, trajectory_error_command_joints_less_than_dof_jumbled)
 {
