@@ -397,7 +397,6 @@ TEST_P(TrajectoryControllerTestParameterized, correct_initialization_using_param
 /**
  * @brief check if state topic is consistent with parameters
  */
-
 TEST_P(TrajectoryControllerTestParameterized, state_topic_consistency)
 {
   rclcpp::executors::SingleThreadedExecutor executor;
@@ -498,7 +497,6 @@ TEST_P(TrajectoryControllerTestParameterized, state_topic_consistency)
 /**
  * @brief same as state_topic_consistency but with #command-joints < #dof
  */
-
 TEST_P(TrajectoryControllerTestParameterized, state_topic_consistency_command_joints_less_than_dof)
 {
   rclcpp::executors::SingleThreadedExecutor executor;
