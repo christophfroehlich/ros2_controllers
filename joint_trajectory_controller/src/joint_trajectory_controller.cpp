@@ -365,7 +365,7 @@ controller_interface::return_type JointTrajectoryController::update(
 
             RCLCPP_INFO(get_node()->get_logger(), "Goal reached, success!");
 
-            add_new_trajectory_msg_RT(set_hold_position());
+            add_new_trajectory_msg_RT(set_success_trajectory_point());
           }
           else if (!within_goal_time)
           {
@@ -1622,6 +1622,19 @@ JointTrajectoryController::set_hold_position()
   hold_position_msg_ptr_->points[0].positions = state_current_.positions;
 
   // set flag, otherwise tolerances will be checked with holding position too
+  rt_is_holding_.writeFromNonRT(true);
+
+  return hold_position_msg_ptr_;
+}
+
+std::shared_ptr<trajectory_msgs::msg::JointTrajectory>
+JointTrajectoryController::set_success_trajectory_point()
+{
+  // set last command to be repeated at success, no matter if it has nonzero velocity or
+  // acceleration
+  hold_position_msg_ptr_->points[0] = traj_external_point_ptr_->get_trajectory_msg()->points.back();
+
+  // set flag, otherwise tolerances will be checked with success_trajectory_point too
   rt_is_holding_.writeFromNonRT(true);
 
   return hold_position_msg_ptr_;
