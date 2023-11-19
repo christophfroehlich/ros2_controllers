@@ -116,7 +116,11 @@ public:
 
   bool is_open_loop() const { return params_.open_loop_control; }
 
-  std::vector<PidPtr> get_pids() const { return pids_; }
+  std::shared_ptr<joint_trajectory_controller_plugins::TrajectoryControllerBase> get_traj_contr()
+    const
+  {
+    return traj_contr_;
+  }
 
   bool has_active_traj() const { return has_active_trajectory(); }
 
@@ -193,7 +197,8 @@ public:
     for (size_t i = 0; i < joint_names_.size(); ++i)
     {
       const std::string prefix = "gains." + joint_names_[i];
-      const rclcpp::Parameter angle_wraparound(prefix + ".angle_wraparound", angle_wraparound_default);
+      const rclcpp::Parameter angle_wraparound(
+        prefix + ".angle_wraparound", angle_wraparound_default);
       node->set_parameters({angle_wraparound});
     }
   }
@@ -230,12 +235,13 @@ public:
   {
     SetUpTrajectoryController(executor);
 
+    SetJointParameters(angle_wraparound);
+
     // add this to simplify tests, can be overwritten by parameters
     rclcpp::Parameter nonzero_vel_parameter("allow_nonzero_velocity_at_trajectory_end", true);
     traj_controller_->get_node()->set_parameter(nonzero_vel_parameter);
 
-    SetJointParameters(normalize_error);
-
+    // set optional parameters
     for (const auto & param : parameters)
     {
       traj_controller_->get_node()->set_parameter(param);

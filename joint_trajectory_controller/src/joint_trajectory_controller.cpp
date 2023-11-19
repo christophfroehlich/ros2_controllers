@@ -126,25 +126,17 @@ controller_interface::return_type JointTrajectoryController::update(
   if (param_listener_->is_old(params_))
   {
     params_ = param_listener_->get_params();
-    // use_closed_loop_pid_adapter_ is updated in on_configure only
-    if (use_closed_loop_pid_adapter_)
+    default_tolerances_ = get_segment_tolerances(params_);
+    // update gains of controller
+    if (traj_contr_)
     {
-      update_pids();
-      default_tolerances_ = get_segment_tolerances(params_);
+      if (traj_contr_->updateGainsRT() == false)
+      {
+        RCLCPP_ERROR(get_node()->get_logger(), "Could not update gains of controller");
+        return controller_interface::return_type::ERROR;
+      }
     }
   }
-
-  // update gains of controller
-  // TODO(christophfroehlich) activate this
-  // once https://github.com/ros-controls/ros2_controllers/pull/761 is merged
-  // if (traj_contr_)
-  // {
-  //   if(traj_contr_->updateGainsRT() == false)
-  //   {
-  //     RCLCPP_ERROR(get_node()->get_logger(), "Could not update gains of controller");
-  //     return controller_interface::return_type::ERROR;
-  //   }
-  // }
 
   auto compute_error_for_joint = [&](
                                    JointTrajectoryPoint & error, size_t index,
@@ -1071,7 +1063,6 @@ controller_interface::CallbackReturn JointTrajectoryController::on_activate(
   {
     cmd_timeout_ = 0.0;
   }
-
   return CallbackReturn::SUCCESS;
 }
 
