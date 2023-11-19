@@ -137,7 +137,7 @@ controller_interface::return_type JointTrajectoryController::update(
   // update gains of controller
   // TODO(christophfroehlich) activate this
   // once https://github.com/ros-controls/ros2_controllers/pull/761 is merged
-  // if (use_closed_loop_control_law_)
+  // if (traj_contr_)
   // {
   //   if(traj_contr_->updateGainsRT() == false)
   //   {
@@ -183,11 +183,11 @@ controller_interface::return_type JointTrajectoryController::update(
   auto new_external_msg = traj_msg_external_point_ptr_.readFromRT();
   // Discard,
   //  if a goal is pending but still not active (somewhere stuck in goal_handle_timer_)
-  //  and if use_closed_loop_control_law_: wait until control law is computed by the traj_contr_
+  //  and if traj_contr_: wait until control law is computed by the traj_contr_
   if (
     current_external_msg != *new_external_msg &&
     (*(rt_has_pending_goal_.readFromRT()) && !active_goal) == false &&
-    (use_closed_loop_control_law_ == false || traj_contr_->is_valid()))
+    (traj_contr_ == nullptr || traj_contr_->is_ready()))
   {
     fill_partial_goal(*new_external_msg);
     sort_to_local_joint_order(*new_external_msg);
@@ -225,6 +225,11 @@ controller_interface::return_type JointTrajectoryController::update(
       else
       {
         traj_external_point_ptr_->set_point_before_trajectory_msg(time, state_current_);
+      }
+      if (traj_contr_)
+      {
+        // set start time of trajectory to traj_contr_
+        traj_contr_->start(time, traj_external_point_ptr_->time_from_start());
       }
     }
 
@@ -298,7 +303,7 @@ controller_interface::return_type JointTrajectoryController::update(
       // set values for next hardware write() if tolerance is met
       if (!tolerance_violated_while_moving && within_goal_time)
       {
-        if (use_closed_loop_control_law_)
+        if (traj_contr_)
         {
           traj_contr_->computeCommands(
             tmp_command_, state_current_, state_error_, state_desired_, time, period);
@@ -1038,7 +1043,7 @@ controller_interface::CallbackReturn JointTrajectoryController::on_activate(
     read_state_from_state_interfaces(last_commanded_state_);
   }
 
-  if (use_closed_loop_control_law_)
+  if (traj_contr_)
   {
     traj_contr_->activate();
   }
@@ -1552,7 +1557,7 @@ void JointTrajectoryController::add_new_trajectory_msg(
   traj_msg_external_point_ptr_.writeFromNonRT(traj_msg);
 
   // compute gains of controller
-  if (use_closed_loop_control_law_)
+  if (traj_contr_)
   {
     if (traj_contr_->computeControlLawNonRT(traj_msg) == false)
     {
