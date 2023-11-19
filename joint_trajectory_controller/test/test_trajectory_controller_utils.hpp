@@ -86,24 +86,9 @@ public:
     return success;
   }
 
-  void set_joint_names(const std::vector<std::string> & joint_names)
-  {
-    params_.joints = joint_names;
-  }
-
   void set_command_joint_names(const std::vector<std::string> & command_joint_names)
   {
     command_joint_names_ = command_joint_names;
-  }
-
-  void set_command_interfaces(const std::vector<std::string> & command_interfaces)
-  {
-    params_.command_interfaces = command_interfaces;
-  }
-
-  void set_state_interfaces(const std::vector<std::string> & state_interfaces)
-  {
-    params_.state_interfaces = state_interfaces;
   }
 
   void trigger_declare_parameters() { param_listener_->declare_params(); }
@@ -112,6 +97,7 @@ public:
   {
     return last_commanded_state_;
   }
+
   bool has_position_state_interface() const { return has_position_state_interface_; }
 
   bool has_velocity_state_interface() const { return has_velocity_state_interface_; }
@@ -126,11 +112,15 @@ public:
 
   bool has_effort_command_interface() const { return has_effort_command_interface_; }
 
-  bool use_closed_loop_pid_adapter() const { return use_closed_loop_pid_adapter_; }
+  bool use_external_control_law() const { return use_external_control_law_; }
 
   bool is_open_loop() const { return params_.open_loop_control; }
 
-  std::vector<PidPtr> get_pids() const { return pids_; }
+  std::shared_ptr<joint_trajectory_controller_plugins::TrajectoryControllerBase> get_traj_contr()
+    const
+  {
+    return traj_contr_;
+  }
 
   bool has_active_traj() const { return has_active_trajectory(); }
 
@@ -199,8 +189,25 @@ public:
     executor.add_node(traj_controller_->get_node()->get_node_base_interface());
   }
 
-  void SetPidParameters(
-    double p_default = 0.0, double ff_default = 1.0, bool angle_wraparound_default = false)
+  void SetJointParameters(bool angle_wraparound_default = false)
+  {
+    traj_controller_->trigger_declare_parameters();
+    auto node = traj_controller_->get_node();
+
+    for (size_t i = 0; i < joint_names_.size(); ++i)
+    {
+      const std::string prefix = "gains." + joint_names_[i];
+      const rclcpp::Parameter angle_wraparound(
+        prefix + ".angle_wraparound", angle_wraparound_default);
+      node->set_parameters({angle_wraparound});
+    }
+  }
+
+  /**
+   * @brief set PIDs for every entry in joint_names_
+   * be aware to update if PIDs should be configured for different command_joints than joint_names
+   */
+  void SetPidParameters(double p_default = 0.0, double ff_default = 1.0)
   {
     traj_controller_->trigger_declare_parameters();
     auto node = traj_controller_->get_node();
@@ -213,9 +220,7 @@ public:
       const rclcpp::Parameter k_d(prefix + ".d", 0.0);
       const rclcpp::Parameter i_clamp(prefix + ".i_clamp", 0.0);
       const rclcpp::Parameter ff_velocity_scale(prefix + ".ff_velocity_scale", ff_default);
-      const rclcpp::Parameter angle_wraparound(
-        prefix + ".angle_wraparound", angle_wraparound_default);
-      node->set_parameters({k_p, k_i, k_d, i_clamp, ff_velocity_scale, angle_wraparound});
+      node->set_parameters({k_p, k_i, k_d, i_clamp, ff_velocity_scale});
     }
   }
 
@@ -243,10 +248,16 @@ public:
     }
     SetUpTrajectoryController(executor, parameters_local);
 
-    // set pid parameters before configure
-    SetPidParameters(k_p, ff, angle_wraparound);
+    SetJointParameters(angle_wraparound);
 
     traj_controller_->get_node()->configure();
+
+    // set pid parameters before activate. The PID plugin has to be loaded already, otherwise
+    // parameters are not declared yet
+    if (traj_controller_->use_external_control_law())
+    {
+      SetPidParameters(k_p, ff);
+    }
 
     ActivateTrajectoryController(
       separate_cmd_and_state_values, initial_pos_joints, initial_vel_joints, initial_acc_joints,
@@ -469,7 +480,7 @@ public:
     // i.e., active but trivial trajectory (one point only)
     EXPECT_TRUE(traj_controller_->has_trivial_traj());
 
-    if (traj_controller_->use_closed_loop_pid_adapter() == false)
+    if (traj_controller_->use_external_control_law() == false)
     {
       if (traj_controller_->has_position_command_interface())
       {
