@@ -28,6 +28,7 @@
   <depend>rclcpp_lifecycle</depend>
   <depend>trajectory_msgs</depend>
   <depend>generate_parameter_library</depend>
+  <depend>joint_trajectory_controller_plugins</depend>
 
   <test_depend>ament_cmake_gmock</test_depend>
   <test_depend>controller_manager</test_depend>

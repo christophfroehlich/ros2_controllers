@@ -17,6 +17,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     rclcpp_lifecycle
     realtime_tools
     trajectory_msgs
+    joint_trajectory_controller_plugins
 )
 
 find_package(ament_cmake REQUIRED)
@@ -102,4 +103,5 @@ install(TARGETS
 
 ament_export_targets(export_joint_trajectory_controller HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
+
 ament_package()
