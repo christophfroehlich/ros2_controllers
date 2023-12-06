@@ -691,6 +691,14 @@ controller_interface::CallbackReturn JointTrajectoryController::on_configure(
     RCLCPP_INFO(
       logger, "No specific joint names are used for command interfaces. Using 'joints' parameter.");
   }
+  // set the parameter for the controller plugin
+  auto result =
+    get_node()->set_parameter(rclcpp::Parameter("command_joints", command_joint_names_));
+  if (result.successful == false)
+  {
+    RCLCPP_ERROR(logger, "Failed to set 'command_joints' parameter");
+    return CallbackReturn::FAILURE;
+  }
   num_cmd_joints_ = command_joint_names_.size();
 
   if (num_cmd_joints_ > dof_)
