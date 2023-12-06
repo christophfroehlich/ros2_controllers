@@ -23,6 +23,7 @@
 
 #include "gmock/gmock.h"
 
+#include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "joint_trajectory_controller/joint_trajectory_controller.hpp"
 #include "joint_trajectory_controller/trajectory.hpp"
@@ -154,6 +155,12 @@ public:
   trajectory_msgs::msg::JointTrajectoryPoint get_state_feedback() { return state_current_; }
   trajectory_msgs::msg::JointTrajectoryPoint get_state_reference() { return state_desired_; }
   trajectory_msgs::msg::JointTrajectoryPoint get_state_error() { return state_error_; }
+  trajectory_msgs::msg::JointTrajectoryPoint get_current_command() { return command_current_; }
+
+  control_msgs::msg::JointTrajectoryControllerState get_state_msg()
+  {
+    return state_publisher_->msg_;
+  }
 
   rclcpp::WaitSet joint_cmd_sub_wait_set_;
 };
@@ -261,6 +268,7 @@ public:
 
     // set pid parameters before configure
     SetPidParameters(k_p, ff, angle_wraparound);
+
     traj_controller_->get_node()->configure();
 
     ActivateTrajectoryController(
