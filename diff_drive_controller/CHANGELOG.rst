@@ -2,6 +2,23 @@
 Changelog for package diff_drive_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.33.0 (2024-02-12)
+-------------------
+* Add test_depend on `hardware_interface_testing` (backport `#1018 <https://github.com/ros-controls/ros2_controllers/issues/1018>`_) (`#1019 <https://github.com/ros-controls/ros2_controllers/issues/1019>`_)
+* Add tests for `interface_configuration_type` consistently (`#899 <https://github.com/ros-controls/ros2_controllers/issues/899>`_) (`#1011 <https://github.com/ros-controls/ros2_controllers/issues/1011>`_)
+* Contributors: mergify[bot]
+
+2.32.0 (2024-01-20)
+-------------------
+
+2.31.0 (2024-01-11)
+-------------------
+
+2.30.0 (2023-12-20)
+-------------------
+* [DiffDriveController] Optional tf namespace prefixes instead of using node namespace (backport `#533 <https://github.com/ros-controls/ros2_controllers/issues/533>`_) (`#726 <https://github.com/ros-controls/ros2_controllers/issues/726>`_)
+* Contributors: mergify[bot]
+
 2.29.0 (2023-12-05)
 -------------------
 

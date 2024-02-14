@@ -26,7 +26,6 @@
 #include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "joint_trajectory_controller/joint_trajectory_controller.hpp"
-#include "joint_trajectory_controller/trajectory.hpp"
 
 namespace
 {
@@ -228,7 +227,7 @@ public:
   /**
    * @brief set PIDs for every entry in joint_names_
    */
-  void SetPidParameters(double p_default = 0.0, double ff_default = 1.0)
+  void SetPidParameters(double p_value = 0.0, double ff_value = 1.0)
   {
     traj_controller_->trigger_declare_parameters();
     auto node = traj_controller_->get_node();
@@ -238,11 +237,11 @@ public:
     for (size_t i = 0; i < command_joint_names.size(); ++i)
     {
       const std::string prefix = "gains." + joint_names_[i];
-      const rclcpp::Parameter k_p(prefix + ".p", p_default);
+      const rclcpp::Parameter k_p(prefix + ".p", p_value);
       const rclcpp::Parameter k_i(prefix + ".i", 0.0);
       const rclcpp::Parameter k_d(prefix + ".d", 0.0);
       const rclcpp::Parameter i_clamp(prefix + ".i_clamp", 0.0);
-      const rclcpp::Parameter ff_velocity_scale(prefix + ".ff_velocity_scale", ff_default);
+      const rclcpp::Parameter ff_velocity_scale(prefix + ".ff_velocity_scale", ff_value);
       node->set_parameters({k_p, k_i, k_d, i_clamp, ff_velocity_scale});
     }
   }
